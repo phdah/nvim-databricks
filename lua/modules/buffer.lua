@@ -36,7 +36,6 @@ M.createBuffer = function(defaultConfigFile)
     -- Set buffer and window options
     vim.api.nvim_win_set_option(win, 'cursorline', true)
     vim.api.nvim_buf_set_option(buf, 'modifiable', false)
-    -- vim.api.nvim_buf_set_option(buf, 'modifiable', false)
 
     vim.api.nvim_buf_set_keymap(buf, 'n', '<CR>', '', {
         noremap = true,
