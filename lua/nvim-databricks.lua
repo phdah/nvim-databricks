@@ -8,7 +8,7 @@ M.setup = function(userOpts)
 
     if opts.configFile == nil then opts.configFile = '~/.databrickscfg' end
 
-    vim.api.nvim_create_user_command('DBCluster', function()
+    vim.api.nvim_create_user_command('DBOpen', function()
         M.createBuffer(opts.configFile)
     end, {})
 
