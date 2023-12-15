@@ -1,5 +1,5 @@
 <h1 align="center">
-  nvim-databricks (0.1.0-beta)
+  nvim-databricks (0.2.0-beta)
 </h1>
 <p align="center">
 A simple, minimalistic, easily plugin to work with Databricks locally
@@ -71,5 +71,8 @@ vim.api.nvim_set_keymap('n', '<new_keymap>', ':DBOpen')
 
 | Feature | Status |
 | --- | --- |
-| Tabs for workspaces | `Not started` |
+| Tabs for workspaces | ✅ |
+| Setup workspace specific output | 🟨 |
+| Build a `run` module, to utelize lua in memory variables for cluster choosing | 🟨 |
+| Add nerd font images for cluster status etc | 🟨 |
 

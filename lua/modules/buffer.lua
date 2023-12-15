@@ -5,43 +5,58 @@ M.restrictBufferMovement = require('modules/configBuffer').restrictBufferMovemen
 M.getClusterName = require('modules/getClusterId').getClusterName
 M.getClusterId = require('modules/getClusterId').getClusterId
 M.setCluster = require('modules/setCluster').setCluster
+M.closeListOfBuffers = require('modules/bufferUtils').closeListOfBuffers
+M.strBufferList = require('modules/bufferUtils').strBufferList
 
+M.bufferStatus = {
+    bufferList = {},
+    win = nil,
+    currentBufferIndex = nil,
+    augroup = nil
+}
 
-M.createBuffer = function(defaultConfigFile)
-    local headerLength = 3
+M.createBuffer = function(opts)
+    local buf
+    buf = M.populateBuffer(opts, M.bufferStatus)
 
-    local buf = M.populateBuffer(headerLength)
-    -- Define the floating window size and position
-    local width = math.floor(vim.o.columns * 0.9)
-    local height = 20
-    local row = math.floor((vim.o.lines - height) / 2)
-    local col = math.ceil((vim.o.columns - width) / 2)
+    table.insert(M.bufferStatus.bufferList, buf)
+end
 
-    -- Create the floating window
-    local opts = {
-        relative = 'editor',
-        width = width,
-        height = height,
-        row = row,
-        col = col,
-        style = 'minimal',
-        border = 'rounded',
-    }
-    local win = vim.api.nvim_open_win(buf, true, opts)
-    local augroup = M.restrictBufferMovement(headerLength, buf)
-
-    -- Set the cursor start
-    vim.api.nvim_win_set_cursor(win, {headerLength+1, 0})
+M.configBuffer = function(opts, buf)
+    vim.api.nvim_win_set_cursor(M.bufferStatus.win, {opts.headerLength+1, 0})
 
     -- Set buffer and window options
-    vim.api.nvim_win_set_option(win, 'cursorline', true)
+    vim.api.nvim_win_set_option(M.bufferStatus.win, 'cursorline', true)
     vim.api.nvim_buf_set_option(buf, 'modifiable', false)
+
+    -- Key mappings for buffer control
+    vim.api.nvim_buf_set_keymap(buf, 'n', 'h', '', {
+        noremap = true,
+        silent = true,
+        callback = function()
+            -- Switch to the previous buffer
+            M.bufferStatus.currentBufferIndex = (M.bufferStatus.currentBufferIndex - 2) % #M.bufferStatus.bufferList + 1
+            local newBuf = M.bufferStatus.bufferList[M.bufferStatus.currentBufferIndex]
+            vim.api.nvim_win_set_buf(M.bufferStatus.win, newBuf)
+        end,
+    })
+
+    vim.api.nvim_buf_set_keymap(buf, 'n', 'l', '', {
+        noremap = true,
+        silent = true,
+        callback = function()
+            -- Switch to the previous buffer
+            M.bufferStatus.currentBufferIndex = (M.bufferStatus.currentBufferIndex % #M.bufferStatus.bufferList) + 1
+            local newBuf = M.bufferStatus.bufferList[M.bufferStatus.currentBufferIndex]
+            vim.api.nvim_win_set_buf(M.bufferStatus.win, newBuf)
+        end,
+    })
 
     vim.api.nvim_buf_set_keymap(buf, 'n', '<CR>', '', {
         noremap = true,
         silent = true,
         callback = function()
-            M.setCluster(M.getClusterId(M.getClusterName(win, buf)), defaultConfigFile)
+            M.setCluster(M.getClusterId(M.getClusterName(M.bufferStatus.win, buf)), opts)
         end,
     })
 
@@ -50,10 +65,32 @@ M.createBuffer = function(defaultConfigFile)
         noremap = true,
         silent = true,
         callback = function()
-            vim.api.nvim_win_close(win, true)
-            vim.api.nvim_del_augroup_by_id(augroup)
+            M.bufferStatus.bufferList = M.closeListOfBuffers(M.bufferStatus.bufferList)
+            vim.api.nvim_del_augroup_by_id(M.bufferStatus.augroup)
         end,
     })
+
+end
+
+M.openBuffer = function(opts)
+    -- Create augroup
+    M.bufferStatus.augroup = vim.api.nvim_create_augroup('LimitCursorMovement', { clear = true })
+
+    -- Create buffers
+    for i = 1 , opts.bufferListLenght do
+        M.bufferStatus.currentBufferIndex = i
+        M.createBuffer(opts)
+    end
+
+    -- Create window
+    M.bufferStatus.currentBufferIndex = 1
+    local initialBuf = M.bufferStatus.bufferList[M.bufferStatus.currentBufferIndex]
+    M.bufferStatus.win = vim.api.nvim_open_win(initialBuf, true, opts.winOpts)
+
+    -- Configure buffers
+    for _, buf in ipairs(M.bufferStatus.bufferList) do
+        M.configBuffer(opts, buf)
+    end
 
 end
 
