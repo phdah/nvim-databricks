@@ -1,16 +1,14 @@
-local M = {}
+local callable = require('modules/callable')
 
-M.openBuffer = require('modules/buffer').openBuffer
+local M = {}
 
 M.setup = function(userOpts)
     -- Set default values if not provided
     local opts = userOpts or {}
 
-    if opts.configFile == nil then opts.configFile = '~/.databrickscfg' end
+    if opts.DBConfigFile == nil then opts.DBConfigFile = '~/.databrickscfg' end
 
-    if opts.headerLength == nil then opts.headerLength = 4 end
-    if opts.bufferListLenght == nil then opts.bufferListLenght = 3 end
-
+    -- Floating window size
     if opts.width == nil then opts.width = math.floor(vim.o.columns * 0.9) end
     if opts.height == nil then opts.height = 20 end
     if opts.row == nil then opts.row = math.floor((vim.o.lines - opts.height) / 2) end
@@ -29,7 +27,7 @@ M.setup = function(userOpts)
 
 
     vim.api.nvim_create_user_command('DBOpen', function()
-        M.openBuffer(opts)
+        callable.openWindow(opts)
     end, {})
 
 end
