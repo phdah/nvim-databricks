@@ -24,15 +24,14 @@ function M.openWindow(opts)
         table.insert(M.BufferState.windows, window)
     end
 
-    for i, window in pairs(M.BufferState.windows) do
-        print(i)
-        print(window.buf)
-        utils.printTable(window, window.name .. " ")
+    -- Create the initial window
+    local win = M.BufferState.windows[1]:createWindow(nil, M.BufferState.windows)
+    -- Setup remaining windows
+    for i=2, #M.BufferState.windows do
+        M.BufferState.windows[i]:createWindow(win, M.BufferState.windows)
     end
 
-    -- utils.printTable(M.BufferState, "BufferState: ")
-    -- Create the initial window
-    -- M.BufferState.windows[1]:createWindow()
+    utils.printTable(M.BufferState)
 
 end
 

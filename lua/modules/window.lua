@@ -1,3 +1,4 @@
+local utils = require('modules/utils')
 local Tab = require('modules/buffers').Tab
 
 ------------
@@ -26,9 +27,6 @@ function Window.new(opts, name, profiles)
     return self
 end
 
-function Window:config()
-end
-
 function Window:populate()
     -- TODO: check if the lines can all go in one table
     -- Set header
@@ -41,12 +39,13 @@ function Window:populate()
 end
 
 function Window:movementRestriction()
-    self.augroup = vim.api.nvim_create_augroup('LimitCursorMovement', { clear = true })
+    -- Don't clear to append to augroup
+    self.augroup = vim.api.nvim_create_augroup('LimitCursorMovement', { clear = false })
     vim.api.nvim_create_autocmd({'CursorMoved', 'CursorMovedI'}, {
         group = self.augroup,
         buffer = self.buf,
         callback = function()
-            local cursor = vim.api.nvim_get_cursor(0)
+            local cursor = vim.api.nvim_win_get_cursor(0)
             if cursor[1] < (self.headerLength+1) or cursor[1] > (self.windowLenght-1) then
                 vim.api.nvim_win_set_cursor(0, {math.min(math.max(self.headerLength+1, cursor[1]), self.windowLenght), cursor[2]})
             end
@@ -69,58 +68,109 @@ function Window:setParentAndChildProfile(bufferState)
     self.child = bufferState[index % bufferStateLength + 1].buf
 end
 
--- function Window:keymaps()
---     -- Key mappings for buffer control
---     vim.api.nvim_buf_set_keymap(buf, 'n', 'h', '', {
---         noremap = true,
---         silent = true,
---         callback = function()
---             -- Switch to the previous buffer
---             M.bufferStatus.currentBufferIndex = (M.bufferStatus.currentBufferIndex - 2) % #M.bufferStatus.bufferList + 1
---             local newBuf = M.bufferStatus.bufferList[M.bufferStatus.currentBufferIndex]
---             vim.api.nvim_win_set_buf(M.bufferStatus.win, newBuf)
---         end,
---     })
+function Window:closeListOfBuffers()
+    for _, buf in ipairs({self.buf, self.parent, self.child}) do
+        -- Close each buffer if it's valid
+        if vim.api.nvim_buf_is_valid(buf) then
+            vim.api.nvim_buf_delete(buf, { force = true })
+        end
+    end
+end
 
---     vim.api.nvim_buf_set_keymap(buf, 'n', 'l', '', {
---         noremap = true,
---         silent = true,
---         callback = function()
---             -- Switch to the previous buffer
---             M.bufferStatus.currentBufferIndex = (M.bufferStatus.currentBufferIndex % #M.bufferStatus.bufferList) + 1
---             local newBuf = M.bufferStatus.bufferList[M.bufferStatus.currentBufferIndex]
---             vim.api.nvim_win_set_buf(M.bufferStatus.win, newBuf)
---         end,
---     })
+function Window:getClusterName()
+    -- Get the current line number
+    local lineNum = vim.api.nvim_win_get_cursor(self.win)[1]
+    -- Get the line's content
+    local lineContent = vim.api.nvim_buf_get_lines(self.buf, lineNum - 1, lineNum, false)[1]
 
---     vim.api.nvim_buf_set_keymap(buf, 'n', '<CR>', '', {
---         noremap = true,
---         silent = true,
---         callback = function()
---             M.setCluster(M.getClusterId(M.getClusterName(M.bufferStatus.win, buf)), opts)
---         end,
---     })
-
---     -- Key mapping to close the buffer
---     vim.api.nvim_buf_set_keymap(buf, 'n', 'q', '', {
---         noremap = true,
---         silent = true,
---         callback = function()
---             M.bufferStatus.bufferList = M.closeListOfBuffers(M.bufferStatus.bufferList)
---             vim.api.nvim_del_augroup_by_id(M.bufferStatus.augroup)
---         end,
---     })
--- end
+    -- Split the lineContent on space and get the cluster name
+    -- The status is the forst word, so we skip that
+    local wordIteration = 0
+    local clusterName = ''
+    for word in lineContent:gmatch("%S+") do
+        if wordIteration == 1 then
+            clusterName = word
+        elseif wordIteration > 1 then
+            clusterName = clusterName .. ' ' .. word
+        end
+        wordIteration = wordIteration + 1
+    end
+    return clusterName
+end
 
 
-function Window:createWindow()
+function Window.getClusterId(clusterName)
+    -- Fetch the cluster id, for the given name
+    -- Note, don't take names with " or '
+    local command = "databricks clusters list --output JSON | jq '.clusters[] | select(.cluster_name == \"" .. clusterName .. "\") | .cluster_id'"
+
+    local clusterId = vim.fn.system(command)
+    if vim.v.shell_error ~= 0 then
+        print("Error executing command: " .. command)
+    end
+    -- Strip away newline
+    clusterId = clusterId:gsub('"', "")
+    clusterId = clusterId:gsub("\n", "")
+    return {clusterId, clusterName}
+
+end
+
+function Window:keymaps()
+    -- Key mappings for buffer control
+    vim.api.nvim_buf_set_keymap(self.buf, 'n', 'h', '', {
+        noremap = true,
+        silent = true,
+        callback = function()
+            -- Switch to the previous buffer
+            utils.printTable({self.win, self.parent})
+            vim.api.nvim_win_set_buf(self.win, self.parent)
+        end,
+    })
+
+    vim.api.nvim_buf_set_keymap(self.buf, 'n', 'l', '', {
+        noremap = true,
+        silent = true,
+        callback = function()
+            -- Switch to the previous buffer
+            utils.printTable({self.win, self.child})
+            vim.api.nvim_win_set_buf(self.win, self.child)
+        end,
+    })
+
+    vim.api.nvim_buf_set_keymap(self.buf, 'n', '<CR>', '', {
+        noremap = true,
+        silent = true,
+        callback = function()
+            self.getClusterId(self:getClusterName())
+        end,
+    })
+
+    -- Key mapping to close the buffer
+    vim.api.nvim_buf_set_keymap(self.buf, 'n', 'q', '', {
+        noremap = true,
+        silent = true,
+        callback = function()
+            self:closeListOfBuffers()
+            vim.api.nvim_del_augroup_by_id(self.augroup)
+        end,
+    })
+end
+
+function Window:createWindow(win, windows)
     -- Open window
-    self.win = vim.api.nvim_open_win(self.buf, true, self.winOpts)
+    self.win = win or vim.api.nvim_open_win(self.buf, true, self.winOpts)
+    self:setupWindow(windows)
+    return self.win
+end
+
+function Window:setupWindow(windows)
     -- Set cursor position
     vim.api.nvim_win_set_cursor(self.win, {self.headerLength+1, 0})
     -- Set buffer and window options
     vim.api.nvim_win_set_option(self.win, 'cursorline', true)
     vim.api.nvim_buf_set_option(self.buf, 'modifiable', false)
+    self:setParentAndChildProfile(windows)
+    self:keymaps()
 end
 
 -------------

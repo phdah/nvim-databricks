@@ -18,7 +18,13 @@ function Buffer:createBuffer()
 end
 
 function Buffer:getClusters()
-    local command = "databricks --profile " .. self.name .. " clusters list --output JSON | jq -r '.clusters[] | \"\" + .state + \" \" + .cluster_name'"
+    --[[
+        The command fetches clusters for the specified profile in the config file.
+        Then it JSON parses the output to filter for cluster names not starting
+        with "job-". Then it returns all existing clusters like:
+        STATE CLUSTER-NAME
+    ]]
+    local command = "databricks --profile " .. self.name .. " clusters list --output JSON | jq -r '.clusters[] | select(.cluster_name | startswith(\"job-\") | not) | \"\" + .state + \" \" + .cluster_name'"
     -- Execute the shell command and get the clusterList
     self.clusters = utils.callAndPaseCommand(command)
     self.clusterLenght = #self.clusters
@@ -37,7 +43,7 @@ local Tab = {
     boarder = "---------------------------",
     header = "[q] quit, [enter] select cluster",
     columns = "Status    Cluster Name",
-    headerLength = 3
+    headerLength = 3 + 1 -- Clusters start on +1 line
 }
 Tab.__index = Tab
 setmetatable(Tab, Buffer)
