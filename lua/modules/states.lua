@@ -25,8 +25,6 @@ setmetatable(Buffer, State)
 
 function Buffer.new(profiles)
     local self = setmetatable({}, Buffer)
-    setmetatable(self, {__index = Buffer, __tostring = State.__tostring})
-
     self.profiles = profiles
 
     return self
@@ -40,9 +38,11 @@ local Selection = {}
 Selection.__index = Selection
 setmetatable(Selection, State)
 
-function Selection.new()
+function Selection.new(profile, clusterId)
     local self = setmetatable({}, Selection)
-    setmetatable(self, {__index = Selection, __tostring = State.__tostring})
+    self.profile = profile or nil
+    self.clusterId = clusterId or nil
+
     return self
 end
 

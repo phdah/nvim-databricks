@@ -99,10 +99,10 @@ function Window:getClusterName()
 end
 
 
-function Window.getClusterId(clusterName)
+function Window:getClusterId(clusterName)
     -- Fetch the cluster id, for the given name
     -- Note, don't take names with " or '
-    local command = "databricks clusters list --output JSON | jq '.clusters[] | select(.cluster_name == \"" .. clusterName .. "\") | .cluster_id'"
+    local command = "databricks --profile " .. self.name .. " clusters list --output JSON | jq '.clusters[] | select(.cluster_name == \"" .. clusterName .. "\") | .cluster_id'"
 
     local clusterId = vim.fn.system(command)
     if vim.v.shell_error ~= 0 then
@@ -111,7 +111,7 @@ function Window.getClusterId(clusterName)
     -- Strip away newline
     clusterId = clusterId:gsub('"', "")
     clusterId = clusterId:gsub("\n", "")
-    return {clusterId, clusterName}
+    return clusterId
 
 end
 
@@ -122,7 +122,6 @@ function Window:keymaps()
         silent = true,
         callback = function()
             -- Switch to the previous buffer
-            utils.printTable({self.win, self.parent})
             vim.api.nvim_win_set_buf(self.win, self.parent)
         end,
     })
@@ -132,7 +131,6 @@ function Window:keymaps()
         silent = true,
         callback = function()
             -- Switch to the previous buffer
-            utils.printTable({self.win, self.child})
             vim.api.nvim_win_set_buf(self.win, self.child)
         end,
     })
@@ -141,7 +139,10 @@ function Window:keymaps()
         noremap = true,
         silent = true,
         callback = function()
-            self.getClusterId(self:getClusterName())
+            ClusterSelectionState.profile = self.name
+            print("Picked cluster: " .. self:getClusterName())
+            ClusterSelectionState.name = self:getClusterName()
+            ClusterSelectionState.clusterId = self:getClusterId(ClusterSelectionState.name)
         end,
     })
 

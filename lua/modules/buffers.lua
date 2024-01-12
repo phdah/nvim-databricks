@@ -41,7 +41,7 @@ end
 
 local Tab = {
     boarder = "---------------------------",
-    header = "[q] quit, [enter] select cluster",
+    header = "[q] quit, [enter] select cluster, [h] left, [l] right",
     columns = "Status    Cluster Name",
     headerLength = 3 + 1 -- Clusters start on +1 line
 }

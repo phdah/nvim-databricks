@@ -6,9 +6,16 @@ local Window = require('modules/window').Window
 
 local M = {}
 
+---------------------------------
+-- Instantiate selection state --
+---------------------------------
+
+ClusterSelectionState = State.Selection.new()
+
 -----------------
 -- Open window --
 -----------------
+
 
 function M.openWindow(opts)
     -- Construct and populate profiles
@@ -31,8 +38,16 @@ function M.openWindow(opts)
         M.BufferState.windows[i]:createWindow(win, M.BufferState.windows)
     end
 
-    utils.printTable(M.BufferState)
+    -- utils.printTable(M.BufferState)
 
+end
+
+-------------------
+-- Run selection --
+-------------------
+
+function M.runSelection()
+    print("Running")
 end
 
 -------------
