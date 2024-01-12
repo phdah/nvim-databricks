@@ -85,17 +85,7 @@ function Window:getClusterName()
 
     -- Split the lineContent on space and get the cluster name
     -- The status is the forst word, so we skip that
-    local wordIteration = 0
-    local clusterName = ''
-    for word in lineContent:gmatch("%S+") do
-        if wordIteration == 1 then
-            clusterName = word
-        elseif wordIteration > 1 then
-            clusterName = clusterName .. ' ' .. word
-        end
-        wordIteration = wordIteration + 1
-    end
-    return clusterName
+    return lineContent:match('%S+%s+(.*)')
 end
 
 
@@ -135,6 +125,12 @@ function Window:keymaps()
         end,
     })
 
+    -- Private function to close windows
+    function self:_closeWindow()
+        self:closeListOfBuffers()
+        vim.api.nvim_del_augroup_by_id(self.augroup)
+    end
+
     vim.api.nvim_buf_set_keymap(self.buf, 'n', '<CR>', '', {
         noremap = true,
         silent = true,
@@ -142,6 +138,7 @@ function Window:keymaps()
             ClusterSelectionState.profile = self.name
             print("Picked cluster: " .. self:getClusterName())
             ClusterSelectionState.name = self:getClusterName()
+            self:_closeWindow()
             ClusterSelectionState.clusterId = self:getClusterId(ClusterSelectionState.name)
         end,
     })
@@ -151,8 +148,7 @@ function Window:keymaps()
         noremap = true,
         silent = true,
         callback = function()
-            self:closeListOfBuffers()
-            vim.api.nvim_del_augroup_by_id(self.augroup)
+            self:_closeWindow()
         end,
     })
 end

@@ -21,6 +21,9 @@ M.setup = function(userOpts)
     if opts.row == nil then opts.row = math.floor((vim.o.lines - opts.height) / 2) end
     if opts.col == nil then opts.col = math.ceil((vim.o.columns - opts.width) / 2) end
 
+    -- Set python version
+    if opts.python == nil then opts.python = "python3.10" end
+
     -------------------------------
     -- Setup base configurations --
     -------------------------------
@@ -45,7 +48,7 @@ M.setup = function(userOpts)
     end, {})
 
     vim.api.nvim_create_user_command('DBRun', function()
-        callable.runSelection()
+        callable.runSelection(opts)
     end, {})
 
     vim.api.nvim_create_user_command('DBPrintState', function()
