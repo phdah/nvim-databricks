@@ -46,25 +46,30 @@ require('nvim-databricks').setup()
 
 ## Configurations
 
-For adding configs, copy these default
+For adding config, copy these default
 ````lua
 require('buff-statusline').setup({
-    configFile = '~/.databrickscfg', -- Databricks connect config file
+    DBConfigFile = '~/.databrickscfg', -- Databricks connect config file
+    python = 'python3.10', -- Specify what Python to use
 })
 ````
+> **_NOTE:_** The values above are the defaults, so if this is what you want, just leave the setup empty.
 
-## Useing
-> **_NOTE:_**  This plugin is used to ineractively configure your `Databricks Connect` setup, but for running your code, that is sepperate.
+## Using
 Here are the functions available to use
 
 | Command | Description |
 | :--- | --- |
-| `DBOpen` | Opens a list of clusters for the current workspace. Choose one, and it will update the config in `~/.databrickscfg`, hence using that cluster for all following runs of the script. |
+| `DBOpen` | Opens a list of clusters for all of the profiles setup in the configuration file. Choose a cluster, and it will update the plugin state, hence using that cluster for all following runs of the script when using `DBRun`. |
+| `DBRun` | Run your currently open Python file, using the selected `profile` and `cluster` from the `DBOpen` command. If no selection has been made, this will use the `DEFAULT` profile from your config. |
+| `DBPrintState` | Print the current selected; `profile`, `cluster id` and `cluster name`. |
 
 
-## Remapping in lua
+## Remapping in Lua
 ````lua
 vim.api.nvim_set_keymap('n', '<new_keymap>', ':DBOpen')
+vim.api.nvim_set_keymap('n', '<new_keymap>', ':DBRun')
+vim.api.nvim_set_keymap('n', '<new_keymap>', ':DBPrintState')
 ````
 
 ## Roadmap
@@ -72,7 +77,9 @@ vim.api.nvim_set_keymap('n', '<new_keymap>', ':DBOpen')
 | Feature | Status |
 | --- | --- |
 | Tabs for workspaces | ✅ |
-| Setup workspace specific output | 🟨 |
-| Build a `run` module, to utelize lua in memory variables for cluster choosing | 🟨 |
-| Add nerd font images for cluster status etc | 🟨 |
+| Setup workspace specific output | ✅ |
+| Build a `run` module, to utelize lua in memory variables for cluster choosing | ✅ |
+| Add `nerd` fonts images for cluster status etc | 🟨 |
+| Optimize window opening by `persisting` buffers | 🟨 |
+| Optimize window using `asynchronous` Databricks API calls | 🟨 |
 
