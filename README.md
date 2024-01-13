@@ -2,7 +2,7 @@
   nvim-databricks (0.2.0-beta)
 </h1>
 <p align="center">
-A simple, minimalistic, easily plugin to work with Databricks locally
+A simple, minimalistic, easy plugin to work with Databricks & Pyspark locally
 </p>
 
 <p align="center">
@@ -17,9 +17,10 @@ nvim-databricks example cluster view
 
 ## Requirements
 
-- Neovim 0.X
+- Neovim `0.9.2`
+- `jq` cli, install for your specific OS
 - `Databricks connect`, [docs](https://learn.microsoft.com/en-us/azure/databricks/dev-tools/databricks-connect/python/)
-- `Databricks CLI`, follow the [docs](https://docs.databricks.com/en/dev-tools/cli/install.html) for installation, and setup your `~/.databrickscfg` file like
+- `Databricks CLI`, follow the [docs](https://docs.databricks.com/en/dev-tools/cli/install.html) for installation, and setup your `~/.databrickscfg` file like:
 ```bash
 [DEFAULT]
 host = <your_host>
@@ -31,7 +32,6 @@ jobs-api-version = 2.1
 [other_profile]
 ...
 ```
-
 
 ## Installation
 
@@ -46,11 +46,11 @@ require('nvim-databricks').setup()
 
 ## Configurations
 
-For adding config, copy these default
+For adding config, add a setup input like
 ````lua
 require('buff-statusline').setup({
-    DBConfigFile = '~/.databrickscfg', -- Databricks connect config file
-    python = 'python3.10', -- Specify what Python to use
+    DBConfigFile = '~/.databrickscfg', -- Set path to Databricks connect config file
+    python = 'python3.10', -- Set Python version for DBRun
 })
 ````
 > **_NOTE:_** The values above are the defaults, so if this is what you want, just leave the setup empty.
@@ -60,8 +60,8 @@ Here are the functions available to use
 
 | Command | Description |
 | :--- | --- |
-| `DBOpen` | Opens a list of clusters for all of the profiles setup in the configuration file. Choose a cluster, and it will update the plugin state, hence using that cluster for all following runs of the script when using `DBRun`. |
-| `DBRun` | Run your currently open Python file, using the selected `profile` and `cluster` from the `DBOpen` command. If no selection has been made, this will use the `DEFAULT` profile from your config. |
+| `DBOpen` | Opens a list of clusters for all of the profiles setup in the configuration file. Choose a cluster, and it will update the plugin state, hence using that cluster for all following runs of a Python script when using `DBRun`, throughout the current neovim session. |
+| `DBRun` | Runs your currently open Python neovim buffer, using the selected `profile` and `cluster` from the `DBOpen` command. If no selection has been made, this will use the `DEFAULT` profile from your config, or specified environemental variables `DATABRICKS_CONFIG_PROFILE` and `DATABRICKS_CLUSTER_ID`. |
 | `DBPrintState` | Print the current selected; `profile`, `cluster id` and `cluster name`. |
 
 
@@ -72,6 +72,9 @@ vim.api.nvim_set_keymap('n', '<new_keymap>', ':DBRun')
 vim.api.nvim_set_keymap('n', '<new_keymap>', ':DBPrintState')
 ````
 
+## Limitations
+* Currently only supports `Pyspark`.
+
 ## Roadmap
 
 | Feature | Status |
@@ -79,7 +82,6 @@ vim.api.nvim_set_keymap('n', '<new_keymap>', ':DBPrintState')
 | Tabs for workspaces | ✅ |
 | Setup workspace specific output | ✅ |
 | Build a `run` module, to utelize lua in memory variables for cluster choosing | ✅ |
-| Add `nerd` fonts images for cluster status etc | 🟨 |
 | Optimize window opening by `persisting` buffers | 🟨 |
 | Optimize window using `asynchronous` Databricks API calls | 🟨 |
-
+| Add `nerd` fonts images for cluster status etc | 🟨 |
