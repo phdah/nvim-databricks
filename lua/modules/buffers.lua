@@ -24,9 +24,15 @@ function Buffer:getClusters()
         with "job-". Then it returns all existing clusters like:
         STATE CLUSTER-NAME
     ]]
-    local command = "databricks --profile " .. self.name .. " clusters list --output JSON | jq -r '.clusters[] | select(.cluster_name | startswith(\"job-\") | not) | \"\" + .state + \" \" + .cluster_name'"
-    -- Execute the shell command and get the clusterList
-    self.clusters = utils.callAndPaseCommand(command)
+    if DB_ASYNC_CLUSTERS_STATE and DB_ASYNC_CLUSTERS_STATE[self.name][1] then
+        self.clusters = DB_ASYNC_CLUSTERS_STATE[self.name]
+    else
+        local command = "databricks --profile " .. self.name .. " clusters list --output JSON | jq -r '.clusters[] | select(.cluster_name | startswith(\"job-\") | not) | \"\" + .state + \" \" + .cluster_name'"
+        -- Execute the shell command and get the clusterList
+        self.clusters = utils.callAndPaseCommand(command)
+        -- TODO: populate table DB_ASYNC_CLUSTERS_STATE with cluster info
+
+    end
     self.clusterLenght = #self.clusters
 
 end

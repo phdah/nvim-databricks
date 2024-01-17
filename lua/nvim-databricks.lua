@@ -1,9 +1,9 @@
-local callable = require('modules/callable')
-local utils = require('modules/utils')
-
 local M = {}
 
 M.setup = function(userOpts)
+    local utils = require('modules/utils')
+    local callable = require('modules/callable')
+    local async = require('modules/databricks_async')
 
     -------------------------------
     -- Setup user configurations --
@@ -38,6 +38,21 @@ M.setup = function(userOpts)
         style = 'minimal',
         border = 'rounded',
     }
+
+    -----------------------------------
+    --      Run setup commands      --
+    -- Only applies to python files --
+    -----------------------------------
+
+    vim.api.nvim_create_augroup("nvim-databricks-augroup", { clear = true })
+
+    vim.api.nvim_create_autocmd("FileType", {
+        group = "nvim-databricks-augroup",
+        pattern = "python",
+        callback = function()
+            DB_ASYNC_CLUSTERS_STATE = async.AsyncClusters.new(opts)
+        end,
+    })
 
     -------------------------
     -- Setup nvim commands --
