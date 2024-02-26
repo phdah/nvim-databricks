@@ -20,7 +20,7 @@ nvim-databricks example cluster view
 - Neovim `0.9.2`
 - `jq` cli, install for your specific OS
 - `Databricks connect`, [docs](https://learn.microsoft.com/en-us/azure/databricks/dev-tools/databricks-connect/python/)
-- `Databricks CLI`, follow the [docs](https://docs.databricks.com/en/dev-tools/cli/install.html) for installation, and setup your `~/.databrickscfg` file like:
+- `Databricks CLI==v0.212.2`, follow the [docs](https://docs.databricks.com/en/dev-tools/cli/install.html) for installation, and setup your `~/.databrickscfg` file like:
 ```bash
 [DEFAULT]
 host = <your_host>
