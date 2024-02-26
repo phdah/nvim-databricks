@@ -1,9 +1,9 @@
-local callable = require('modules/callable')
-local utils = require('modules/utils')
-
 local M = {}
 
 M.setup = function(userOpts)
+    DBUtils = require('modules/utils')
+    local callable = require('modules/callable')
+    local async = require('modules/databricks_async')
 
     -------------------------------
     -- Setup user configurations --
@@ -39,6 +39,21 @@ M.setup = function(userOpts)
         border = 'rounded',
     }
 
+    -----------------------------------
+    --      Run setup commands      --
+    -- Only applies to python files --
+    -----------------------------------
+
+    vim.api.nvim_create_augroup("nvim-databricks-augroup", { clear = true })
+    DB_CLUSTERS_LIST = {}
+    vim.api.nvim_create_autocmd("FileType", {
+        group = "nvim-databricks-augroup",
+        pattern = "python",
+        callback = function()
+            DB_CLUSTERS_LIST = async.AsyncClusters.new(opts)
+        end,
+    })
+
     -------------------------
     -- Setup nvim commands --
     -------------------------
@@ -52,7 +67,7 @@ M.setup = function(userOpts)
     end, {})
 
     vim.api.nvim_create_user_command('DBPrintState', function()
-        utils.printTable(ClusterSelectionState, "Cluster selection: ")
+        DBUtils.printTable(ClusterSelectionState, "Cluster selection: ")
     end, {})
 
 end
