@@ -24,9 +24,6 @@ function AsyncClusters:createOnRead(profile)
 
     return {
         on_stdout = function(err, data)
-            if err then
-                -- print("Error on profile " .. profile .. ": ", err)
-            end
             if data then
                 for _, line in ipairs(data) do
                     if line ~= "" then

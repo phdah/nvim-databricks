@@ -31,13 +31,6 @@ function M.openWindow(opts)
 
         table.insert(M.BufferState.windows, window)
 
-        -- if DB_ASYNC_CLUSTERS_STATE then
-        --     DB_ASYNC_CLUSTERS_STATE[window.name] = {}
-        --     DB_ASYNC_CLUSTERS_STATE[window.name] = window.clusters
-        -- else
-        --     DB_ASYNC_CLUSTERS_STATE = async.AsyncClusters.new(opts)
-        --     DB_ASYNC_CLUSTERS_STATE[window.name] = window.clusters
-        -- end
     end
 
     -- Create the initial window
@@ -46,8 +39,6 @@ function M.openWindow(opts)
     for i=2, #M.BufferState.windows do
         M.BufferState.windows[i]:createWindow(win, M.BufferState.windows)
     end
-
-    -- utils.printTable(M.BufferState)
 
 end
 
@@ -66,14 +57,13 @@ function M.runSelection(opts)
         print("No cluster selected, using DEFAULT config from " .. opts.DBConfigFile)
     end
 
-    print(command)
-    -- local result = vim.fn.system(command)
-    -- if vim.v.shell_error ~= 0 then
-    --     print("Error executing command: " .. command)
-    -- else
-    --     print()
-    --     print(result)
-    -- end
+    local result = vim.fn.system(command)
+    if vim.v.shell_error ~= 0 then
+        print("Error executing command: " .. result)
+    else
+        print()
+        print(result)
+    end
 
 end
 
