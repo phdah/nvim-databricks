@@ -24,7 +24,7 @@ function Buffer:getClusters()
         with "job-". Then it returns all existing clusters like:
         STATE CLUSTER-NAME
     ]]
-    local command = "databricks --profile " .. self.name .. " clusters list --output JSON | jq -r '.clusters[] | select(.cluster_name | startswith(\"job-\") | not) | \"\" + .state + \" \" + .cluster_name'"
+    local command = "databricks --profile " .. self.name .. " clusters list --output JSON | jq -r '.[] | select(.cluster_name | startswith(\"job-\") | not) | \"\" + .state + \" \" + .cluster_name'"
     -- Execute the shell command and get the clusterList
     self.clusters = utils.callAndPaseCommand(command)
     self.clusterLenght = #self.clusters

@@ -92,7 +92,7 @@ end
 function Window:getClusterId(clusterName)
     -- Fetch the cluster id, for the given name
     -- Note, don't take names with " or '
-    local command = "databricks --profile " .. self.name .. " clusters list --output JSON | jq '.clusters[] | select(.cluster_name == \"" .. clusterName .. "\") | .cluster_id'"
+    local command = "databricks --profile " .. self.name .. " clusters list --output JSON | jq '.[] | select(.cluster_name == \"" .. clusterName .. "\") | .cluster_id'"
 
     local clusterId = vim.fn.system(command)
     if vim.v.shell_error ~= 0 then
