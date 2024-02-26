@@ -17,7 +17,7 @@ function Window.new(opts, name, profiles)
     -- Run helper functions
     self:createTabs(profiles)
     self:createBuffer()
-    self:getClusters()
+    self:getClusters(false)
     self.windowLenght = self.headerLength + self.clusterLenght
 
     -- Setup window
@@ -149,6 +149,30 @@ function Window:keymaps()
         silent = true,
         callback = function()
             self:_closeWindow()
+        end,
+    })
+
+    -- Key mapping to re-draw the buffer
+    vim.api.nvim_buf_set_keymap(self.buf, 'n', 'r', '', {
+        noremap = true,
+        silent = true,
+        callback = function()
+            self:_closeWindow()
+            -- Get cluster info for the specific profile
+            self:getClusters(true)
+            vim.cmd("DBOpen")
+        end,
+    })
+
+    -- Key mapping to re-draw all the buffers
+    vim.api.nvim_buf_set_keymap(self.buf, 'n', 'R', '', {
+        noremap = true,
+        silent = true,
+        callback = function()
+            self:_closeWindow()
+            -- Get cluster info for all the buffers
+            DB_CLUSTERS_LIST = {}
+            vim.cmd("DBOpen")
         end,
     })
 end

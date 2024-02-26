@@ -3,6 +3,7 @@ local listProfiles = require('modules/profiles').listProfiles
 local State = require('modules/states')
 local ProfilesStruct = require('modules/profiles').ProfilesStruct
 local Window = require('modules/window').Window
+local async = require('modules/databricks_async')
 
 local M = {}
 
@@ -29,6 +30,7 @@ function M.openWindow(opts)
         local window = Window.new(opts, tostring(v), M.BufferState.profiles)
 
         table.insert(M.BufferState.windows, window)
+
     end
 
     -- Create the initial window
@@ -37,8 +39,6 @@ function M.openWindow(opts)
     for i=2, #M.BufferState.windows do
         M.BufferState.windows[i]:createWindow(win, M.BufferState.windows)
     end
-
-    -- utils.printTable(M.BufferState)
 
 end
 
@@ -59,7 +59,7 @@ function M.runSelection(opts)
 
     local result = vim.fn.system(command)
     if vim.v.shell_error ~= 0 then
-        print("Error executing command: " .. command)
+        print("Error executing command: " .. result)
     else
         print()
         print(result)
