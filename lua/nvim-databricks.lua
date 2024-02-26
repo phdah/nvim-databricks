@@ -45,12 +45,12 @@ M.setup = function(userOpts)
     -----------------------------------
 
     vim.api.nvim_create_augroup("nvim-databricks-augroup", { clear = true })
-
+    DB_CLUSTERS_LIST = {}
     vim.api.nvim_create_autocmd("FileType", {
         group = "nvim-databricks-augroup",
         pattern = "python",
         callback = function()
-            DB_ASYNC_CLUSTERS_STATE = async.AsyncClusters.new(opts)
+            DB_CLUSTERS_LIST = async.AsyncClusters.new(opts)
         end,
     })
 

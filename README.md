@@ -77,15 +77,20 @@ vim.api.nvim_set_keymap('n', '<new_keymap>', ':DBPrintState')
 
 ## Roadmap
 
-| Bugs | Status |
-| --- | --- |
-| JSON output of `databricks clusters list` is different between versions, hence, parsing is not working. | 🟨 |
-
 | Feature | Status |
 | --- | --- |
 | Tabs for workspaces | ✅ |
 | Setup workspace specific output | ✅ |
 | Build a `run` module, to utelize lua in memory variables for cluster choosing | ✅ |
-| Optimize window opening by `persisting` buffers | 🟨 |
-| Optimize window using `asynchronous` Databricks API calls | 🟨 |
+| Optimize window opening by `persisting` buffers | ✅ |
+| Optimize window using `asynchronous` Databricks API calls | ✅ |
+| Add a complete UI, which displays graphical objects | 🟨 |
+| Add graphical objects to indicate, e.g., selected cluster and its state | 🟨 |
 | Add `nerd` fonts images for cluster status etc | 🟨 |
+| Add file type check for how to run with `DBRun`, e.g., if `.py` use `python` | 🟨 |
+
+## Known bugs
+
+| Bugs | Status | Solution |
+| --- | --- | --- |
+| JSON output of `databricks clusters list` is different between versions, hence, parsing is not working. | ✅ | Using the standard of `Databricks CLI v0.212.2`, which outputs a list of JSONs |
