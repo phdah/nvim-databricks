@@ -54,7 +54,7 @@ end
 
 function AsyncClusters:asyncGetClusters()
     for profile, _ in pairs(self) do
-        local command = "databricks --profile " .. profile .. " clusters list --output JSON | jq -r '.clusters[] | select(.cluster_name | startswith(\"job-\") | not) | \"\" + .state + \" \" + .cluster_name'"
+        local command = "databricks --profile " .. profile .. " clusters list --output JSON | jq -r '.[] | select(.cluster_name | startswith(\"job-\") | not) | .state + \" \" + .cluster_name'"
 
         local handlers = self:createOnRead(profile)
         vim.fn.jobstart(command, {

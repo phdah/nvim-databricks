@@ -77,6 +77,10 @@ vim.api.nvim_set_keymap('n', '<new_keymap>', ':DBPrintState')
 
 ## Roadmap
 
+| Bugs | Status |
+| --- | --- |
+| JSON output of `databricks clusters list` is different between versions, hence, parsing is not working. | 🟨 |
+
 | Feature | Status |
 | --- | --- |
 | Tabs for workspaces | ✅ |

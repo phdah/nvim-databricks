@@ -1,7 +1,7 @@
 local M = {}
 
 M.setup = function(userOpts)
-    local utils = require('modules/utils')
+    DBUtils = require('modules/utils')
     local callable = require('modules/callable')
     local async = require('modules/databricks_async')
 
@@ -67,7 +67,7 @@ M.setup = function(userOpts)
     end, {})
 
     vim.api.nvim_create_user_command('DBPrintState', function()
-        utils.printTable(ClusterSelectionState, "Cluster selection: ")
+        DBUtils.printTable(ClusterSelectionState, "Cluster selection: ")
     end, {})
 
 end

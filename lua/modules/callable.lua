@@ -3,6 +3,7 @@ local listProfiles = require('modules/profiles').listProfiles
 local State = require('modules/states')
 local ProfilesStruct = require('modules/profiles').ProfilesStruct
 local Window = require('modules/window').Window
+local async = require('modules/databricks_async')
 
 local M = {}
 
@@ -29,6 +30,14 @@ function M.openWindow(opts)
         local window = Window.new(opts, tostring(v), M.BufferState.profiles)
 
         table.insert(M.BufferState.windows, window)
+
+        -- if DB_ASYNC_CLUSTERS_STATE then
+        --     DB_ASYNC_CLUSTERS_STATE[window.name] = {}
+        --     DB_ASYNC_CLUSTERS_STATE[window.name] = window.clusters
+        -- else
+        --     DB_ASYNC_CLUSTERS_STATE = async.AsyncClusters.new(opts)
+        --     DB_ASYNC_CLUSTERS_STATE[window.name] = window.clusters
+        -- end
     end
 
     -- Create the initial window
@@ -57,13 +66,14 @@ function M.runSelection(opts)
         print("No cluster selected, using DEFAULT config from " .. opts.DBConfigFile)
     end
 
-    local result = vim.fn.system(command)
-    if vim.v.shell_error ~= 0 then
-        print("Error executing command: " .. command)
-    else
-        print()
-        print(result)
-    end
+    print(command)
+    -- local result = vim.fn.system(command)
+    -- if vim.v.shell_error ~= 0 then
+    --     print("Error executing command: " .. command)
+    -- else
+    --     print()
+    --     print(result)
+    -- end
 
 end
 
