@@ -61,7 +61,6 @@ function M.runSelection(opts)
     if vim.v.shell_error ~= 0 then
         print("Error executing command: " .. result)
     else
-        print()
         print(result)
     end
 
