@@ -88,19 +88,19 @@ function Window:getClusterName()
     return lineContent:match('%S+%s+(.*)')
 end
 
-
 function Window:getClusterId(clusterName)
-    -- Fetch the cluster id, for the given name
-    -- Note, don't take names with " or '
-    local command = "databricks --profile " .. self.name .. " clusters list --output JSON | jq '.[] | select(.cluster_name == \"" .. clusterName .. "\") | .cluster_id'"
-
-    local clusterId = vim.fn.system(command)
-    if vim.v.shell_error ~= 0 then
-        print("Error executing command: " .. command)
+    -- Look through clusterTable to find clusterName
+    local clusterId = nil
+    for k, v in pairs(self.clustersTable) do
+        if k == clusterName then
+            clusterId = v[1]
+            return clusterId
+        end
     end
-    -- Strip away newline
-    clusterId = clusterId:gsub('"', "")
-    clusterId = clusterId:gsub("\n", "")
+    if not clusterId then
+        print("Error, no cluster id found for " .. clusterName)
+    end
+
     return clusterId
 
 end

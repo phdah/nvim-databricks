@@ -35,12 +35,8 @@ function AsyncClusters:createOnRead(profile)
         on_exit = function(job_id, exit_code)
             if exit_code == 0 then
                 for _, line in ipairs(data_accumulator) do
-                    local parts = vim.split(line, " ")
-                    if #parts >= 2 then
-                        local state = parts[1]
-                        local cluster_name = table.concat(parts, " ", 2)
-                        table.insert(self[profile], state .. " " .. cluster_name)
-                    end
+                    local parts = vim.split(line, "|")
+                    table.insert(self[profile], parts)
                 end
             else
                 print("Job exited with code: ", exit_code)
@@ -51,7 +47,7 @@ end
 
 function AsyncClusters:asyncGetClusters()
     for profile, _ in pairs(self) do
-        local command = "databricks --profile " .. profile .. " clusters list --output JSON | jq -r '.[] | select(.cluster_name | startswith(\"job-\") | not) | .state + \" \" + .cluster_name'"
+        local command = "databricks --profile " .. profile .. [[ clusters list --output JSON | jq -r '.[] | select(.cluster_name | startswith("job-") | not) | .cluster_id + "|" + .state + "|" + .cluster_name']]
 
         local handlers = self:createOnRead(profile)
         vim.fn.jobstart(command, {
