@@ -46,24 +46,26 @@ end
 -- Run selection --
 -------------------
 
-function M.runSelection(opts)
+local function parseCommand(opts)
     local currentFile = vim.api.nvim_buf_get_name(0)
-    print('==================================')
-    print("Running file: " .. currentFile:match('.*/(%S*)'))
-    local echoCommand = "echo \"Profile: $DATABRICKS_CONFIG_PROFILE\" && echo \"ClusterID: $DATABRICKS_CLUSTER_ID\" && echo '==================================' && "
+    local echoCommand = [[echo "==================================" && echo "Running file: ]] .. currentFile:match('.*/(%S*)') .. [[" && echo "Profile: $DATABRICKS_CONFIG_PROFILE" && echo "ClusterID: $DATABRICKS_CLUSTER_ID" && echo "==================================" && ]]
     local command = echoCommand .. opts.python .. " " .. currentFile
-    if ClusterSelectionState.profile and ClusterSelectionState.clusterId then command = "export DATABRICKS_CONFIG_PROFILE=" .. ClusterSelectionState.profile .. " && export DATABRICKS_CLUSTER_ID=" .. ClusterSelectionState.clusterId .. " && " .. echoCommand .. opts.python .. " " .. currentFile
+    if ClusterSelectionState.profile and ClusterSelectionState.clusterId then
+        command = "export DATABRICKS_CONFIG_PROFILE="
+        .. ClusterSelectionState.profile
+        .. " && export DATABRICKS_CLUSTER_ID="
+        .. ClusterSelectionState.clusterId
+        .. " && " .. echoCommand .. opts.python .. " " .. currentFile
     else
         print("No cluster selected, using DEFAULT config from " .. opts.DBConfigFile)
     end
+    return command
+end
 
-    local result = vim.fn.system(command)
-    if vim.v.shell_error ~= 0 then
-        print("Error executing command: " .. result)
-    else
-        print(result)
-    end
+function M.runSelection(opts)
+    local command = parseCommand(opts)
 
+    vim.cmd('split | terminal ' .. command)
 end
 
 -------------

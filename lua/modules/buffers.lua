@@ -21,16 +21,22 @@ function Buffer:getClusters(fresh)
     --[[
         The command fetches clusters for the specified profile in the config file.
         Then it JSON parses the output to filter for cluster names not starting
-        with "job-". Then it returns all existing clusters like:
-        STATE CLUSTER-NAME
+        with "job-". Then it returns all existing clusters
     ]]
     if DB_CLUSTERS_LIST and DB_CLUSTERS_LIST[self.name] and #DB_CLUSTERS_LIST[self.name] > 0  and not fresh then
-        self.clusters = DB_CLUSTERS_LIST[self.name]
+        self.clustersTable = utils.addTableKeys(DB_CLUSTERS_LIST[self.name], 3)
+        self.clusters = utils.getClusterStateAndName(DB_CLUSTERS_LIST[self.name])
     else
-        local command = "databricks --profile " .. self.name .. " clusters list --output JSON | jq -r '.[] | select(.cluster_name | startswith(\"job-\") | not) | .state + \" \" + .cluster_name'"
-        -- Execute the shell command and get the clusterList
-        self.clusters = utils.callAndPaseCommand(command)
-        DB_CLUSTERS_LIST[self.name] = utils.tableCopy(self.clusters)
+        local command = "databricks --profile " .. self.name .. [[ clusters list --output JSON | jq -r '.[] | select(.cluster_name | startswith("job-") | not) | .cluster_id + "|" + .state + "|" + .cluster_name']]
+        -- Execute the shell command and get the clusters
+        local clustersTable = utils.addTableKeys(utils.callLines(command, '|'), 3)
+        self.clustersTable = clustersTable
+
+        -- Specifically encode to be a table of strings
+        -- with only STATE and NAME
+        self.clusters = utils.getClusterStateAndName(clustersTable)
+
+        DB_CLUSTERS_LIST[self.name] = utils.tableCopy(self.clustersTable)
     end
     self.clusterLenght = #self.clusters
 

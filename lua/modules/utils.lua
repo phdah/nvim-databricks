@@ -24,25 +24,40 @@ function M.printTable(tbl, _msg)
     print(msg .. "{\n" .. prepareResult(tbl, "") .. "\n}")
 end
 
-function M.parseCommandReturnList(list)
-    local result = {}
-    local resultIteration = 0
-    for s in list:gmatch("[^\r\n]+") do
-        table.insert(result, s)
-        resultIteration = resultIteration + 1
-    end
-
-    return result
+function M.addTableKeys(table, keyNumber)
+        local newTable = {}
+        for _, v in ipairs(table) do
+            newTable[v[keyNumber]] = v
+        end
+        return newTable
 end
 
-function M.callAndPaseCommand(command)
-    local commandResult = vim.fn.system(command)
+function M.getClusterStateAndName(splitLines)
+    local transformed = {}
+    for _, v in pairs(splitLines) do
+        -- Concatenate the state and name with a space and add to the new table
+        table.insert(transformed, v[2] .. " " .. v[3])
+    end
+    return transformed
+end
+
+function M.callLines(command, seperator)
+    local lines = vim.fn.systemlist(command)
     if vim.v.shell_error ~= 0 then
         print("Error executing command: " .. command)
         return
     end
 
-    return M.parseCommandReturnList(commandResult)
+    if seperator then
+        local splitLines = {}
+        for _, line in ipairs(lines) do
+            table.insert(splitLines, vim.split(line, seperator))
+        end
+        return splitLines
+    end
+
+    return lines
+
 end
 
 function M.tableCopy(orig)

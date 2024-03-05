@@ -47,7 +47,7 @@ local function listProfiles(file)
     local fileName = file or "~/.databrickscfg"
     local command = "grep '^\\[' " .. fileName .. " | sed 's/[][]//g'"
 
-    return utils.callAndPaseCommand(command)
+    return utils.callLines(command, nil)
 
 end
 
