@@ -2,8 +2,8 @@ local utils = require('modules/utils')
 local listProfiles = require('modules/profiles').listProfiles
 local State = require('modules/states')
 local ProfilesStruct = require('modules/profiles').ProfilesStruct
+local ClusterWindow = require('modules/window').ClusterWindow
 local Window = require('modules/window').Window
-local async = require('modules/databricks_async')
 
 local M = {}
 
@@ -12,13 +12,14 @@ local M = {}
 ---------------------------------
 
 ClusterSelectionState = State.Selection.new()
+RunOutputState = State.RunOutput.new()
 
 -----------------
 -- Open window --
 -----------------
 
 
-function M.openWindow(opts)
+function M.openClusterWindow(opts)
     -- Construct and populate profiles
     local profiles = ProfilesStruct.new()
     profiles:populate(listProfiles(opts.DBConfigFile))
@@ -27,17 +28,17 @@ function M.openWindow(opts)
     -- Construct buffers in BufferState
     M.BufferState.windows = {}
     for _, v in pairs(M.BufferState.profiles) do
-        local window = Window.new(opts, tostring(v), M.BufferState.profiles)
+        local window = ClusterWindow.new(opts, tostring(v), M.BufferState.profiles)
 
         table.insert(M.BufferState.windows, window)
 
     end
 
     -- Create the initial window
-    local win = M.BufferState.windows[1]:createWindow(nil, M.BufferState.windows)
+    local win = M.BufferState.windows[1]:createClusterWindow(nil, M.BufferState.windows)
     -- Setup remaining windows
     for i=2, #M.BufferState.windows do
-        M.BufferState.windows[i]:createWindow(win, M.BufferState.windows)
+        M.BufferState.windows[i]:createClusterWindow(win, M.BufferState.windows)
     end
 
 end
@@ -65,7 +66,15 @@ end
 function M.runSelection(opts)
     local command = parseCommand(opts)
 
-    vim.cmd('split | terminal ' .. command)
+    if RunOutputState[opts.python] then
+        RunOutputState[opts.python]:createWindow()
+    else
+        local window = Window.new(opts, opts.python)
+        window:createWindow()
+        RunOutputState[opts.python] = window
+    end
+
+    vim.fn.termopen(command)
 end
 
 -------------

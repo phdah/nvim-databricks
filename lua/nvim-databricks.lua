@@ -59,7 +59,7 @@ M.setup = function(userOpts)
     -------------------------
 
     vim.api.nvim_create_user_command('DBOpen', function()
-        callable.openWindow(opts)
+        callable.openClusterWindow(opts)
     end, {})
 
     vim.api.nvim_create_user_command('DBRun', function()

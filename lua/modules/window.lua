@@ -9,8 +9,33 @@ local Window = {}
 Window.__index = Window
 setmetatable(Window, Tab)
 
-function Window.new(opts, name, profiles)
+function Window.new(opts, name)
     local self = setmetatable({}, Window)
+    self.name = name
+    self.winOpts = opts.winOpts
+
+    -- Run helper functions
+    self:createBuffer()
+
+    return self
+end
+
+-- Create and open a window with given options
+function Window:createWindow()
+    -- Open window
+    vim.api.nvim_open_win(self.buf, true, self.winOpts)
+end
+
+--------------------
+-- CLuster Window --
+--------------------
+
+local ClusterWindow = {}
+ClusterWindow.__index = ClusterWindow
+setmetatable(ClusterWindow, Window)
+
+function ClusterWindow.new(opts, name, profiles)
+    local self = setmetatable({}, ClusterWindow)
     self.name = name
     self.winOpts = opts.winOpts
 
@@ -27,7 +52,7 @@ function Window.new(opts, name, profiles)
     return self
 end
 
-function Window:populate()
+function ClusterWindow:populate()
     -- TODO: check if the lines can all go in one table
     -- Set header
     vim.api.nvim_buf_set_lines(self.buf, 0, -1, false, {self.header, ""})
@@ -38,7 +63,7 @@ function Window:populate()
     vim.api.nvim_buf_set_lines(self.buf, self.windowLenght, self.windowLenght, false, {self.boarder, self.tabs[self.name]})
 end
 
-function Window:movementRestriction()
+function ClusterWindow:movementRestriction()
     -- Don't clear to append to augroup
     self.augroup = vim.api.nvim_create_augroup('LimitCursorMovement', { clear = false })
     vim.api.nvim_create_autocmd({'CursorMoved', 'CursorMovedI'}, {
@@ -53,7 +78,7 @@ function Window:movementRestriction()
     })
 end
 
-function Window:setParentAndChildProfile(bufferState)
+function ClusterWindow:setParentAndChildProfile(bufferState)
     local index = nil
     local bufferStateLength = #bufferState
 
@@ -68,7 +93,7 @@ function Window:setParentAndChildProfile(bufferState)
     self.child = bufferState[index % bufferStateLength + 1].buf
 end
 
-function Window:closeListOfBuffers()
+function ClusterWindow:closeListOfBuffers()
     for _, buf in ipairs({self.buf, self.parent, self.child}) do
         -- Close each buffer if it's valid
         if vim.api.nvim_buf_is_valid(buf) then
@@ -77,7 +102,7 @@ function Window:closeListOfBuffers()
     end
 end
 
-function Window:getClusterName()
+function ClusterWindow:getClusterName()
     -- Get the current line number
     local lineNum = vim.api.nvim_win_get_cursor(self.win)[1]
     -- Get the line's content
@@ -88,7 +113,7 @@ function Window:getClusterName()
     return lineContent:match('%S+%s+(.*)')
 end
 
-function Window:getClusterId(clusterName)
+function ClusterWindow:getClusterId(clusterName)
     -- Look through clusterTable to find clusterName
     local clusterId = nil
     for k, v in pairs(self.clustersTable) do
@@ -105,7 +130,7 @@ function Window:getClusterId(clusterName)
 
 end
 
-function Window:keymaps()
+function ClusterWindow:keymaps()
     -- Key mappings for buffer control
     vim.api.nvim_buf_set_keymap(self.buf, 'n', 'h', '', {
         noremap = true,
@@ -126,7 +151,7 @@ function Window:keymaps()
     })
 
     -- Private function to close windows
-    function self:_closeWindow()
+    function self:_closeClusterWindow()
         self:closeListOfBuffers()
         vim.api.nvim_del_augroup_by_id(self.augroup)
     end
@@ -138,7 +163,7 @@ function Window:keymaps()
             ClusterSelectionState.profile = self.name
             print("Picked cluster: " .. self:getClusterName())
             ClusterSelectionState.name = self:getClusterName()
-            self:_closeWindow()
+            self:_closeClusterWindow()
             ClusterSelectionState.clusterId = self:getClusterId(ClusterSelectionState.name)
         end,
     })
@@ -148,7 +173,7 @@ function Window:keymaps()
         noremap = true,
         silent = true,
         callback = function()
-            self:_closeWindow()
+            self:_closeClusterWindow()
         end,
     })
 
@@ -157,7 +182,7 @@ function Window:keymaps()
         noremap = true,
         silent = true,
         callback = function()
-            self:_closeWindow()
+            self:_closeClusterWindow()
             -- Get cluster info for the specific profile
             self:getClusters(true)
             vim.cmd("DBOpen")
@@ -169,7 +194,7 @@ function Window:keymaps()
         noremap = true,
         silent = true,
         callback = function()
-            self:_closeWindow()
+            self:_closeClusterWindow()
             -- Get cluster info for all the buffers
             DB_CLUSTERS_LIST = {}
             vim.cmd("DBOpen")
@@ -177,14 +202,14 @@ function Window:keymaps()
     })
 end
 
-function Window:createWindow(win, windows)
+function ClusterWindow:createClusterWindow(win, windows)
     -- Open window
     self.win = win or vim.api.nvim_open_win(self.buf, true, self.winOpts)
-    self:setupWindow(windows)
+    self:setupClusterWindow(windows)
     return self.win
 end
 
-function Window:setupWindow(windows)
+function ClusterWindow:setupClusterWindow(windows)
     -- Set cursor position
     vim.api.nvim_win_set_cursor(self.win, {self.headerLength+1, 0})
     -- Set buffer and window options
@@ -200,6 +225,7 @@ end
 
 local M = {}
 
+M.ClusterWindow = ClusterWindow
 M.Window = Window
 
 return M
