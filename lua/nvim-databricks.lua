@@ -60,6 +60,10 @@ M.setup = function(userOpts)
         callable.runSelection(opts)
     end, {})
 
+    vim.api.nvim_create_user_command('DBRunOpen', function()
+        callable.runOutputOpen(opts)
+    end, {})
+
     vim.api.nvim_create_user_command('DBPrintState', function()
         DBUtils.printTable(ClusterSelectionState, "Cluster selection: ")
     end, {})

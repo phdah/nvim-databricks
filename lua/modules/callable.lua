@@ -66,18 +66,36 @@ local function parseCommand(opts)
     return command
 end
 
+--[[
+Run the current file, given specified cluster
+and profile from selection in DBOpen. If no
+selection has been made, the DEFAULT profile
+is used from your DBConfigFile ('~/.databrickscfg' )
+configuration file
+]]
 function M.runSelection(opts)
     local command = parseCommand(opts)
 
-    if RunOutputState[opts.python] then
-        RunOutputState[opts.python]:createWindow()
-    else
-        local window = Window.new(opts, opts.python)
-        window:createWindow()
-        RunOutputState[opts.python] = window
-    end
+    -- Dynamically set the height of the window
+    opts.winOpts = utils.setWindowSize(opts.winOpts, 0.7, 0.9)
+
+    local window = Window.new(opts, opts.python)
+    window:createWindow()
+    RunOutputState[opts.python] = window
 
     vim.fn.termopen(command)
+
+end
+
+--[[
+Open the run output, if any exists
+]]
+function M.runOutputOpen(opts)
+    if not RunOutputState[opts.python] then
+        print("No run performed yet. Run command :DBRun to run the current file. See :h DBRun")
+        return
+    end
+    RunOutputState[opts.python]:createWindow()
 end
 
 -------------

@@ -20,7 +20,7 @@ function Window.new(opts, name)
     return self
 end
 
--- Create and open a window with given options
+-- Create and open a window with instance options
 function Window:createWindow()
     -- Open window
     vim.api.nvim_open_win(self.buf, true, self.winOpts)
