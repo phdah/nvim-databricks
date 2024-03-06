@@ -20,6 +20,9 @@ RunOutputState = State.RunOutput.new()
 
 
 function M.openClusterWindow(opts)
+    -- Dynamically set the height of the window
+    opts.winOpts = utils.setWindowSize(opts.winOpts, 0.4, 0.9)
+
     -- Construct and populate profiles
     local profiles = ProfilesStruct.new()
     profiles:populate(listProfiles(opts.DBConfigFile))

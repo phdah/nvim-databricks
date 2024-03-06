@@ -74,4 +74,19 @@ function M.tableCopy(orig)
     return copy
 end
 
+
+--[[
+Dynamically set the height of the window
+and return a table with settings. Input is in
+percentage for both height and width
+]]
+function M.setWindowSize(winOpts, height, width)
+    winOpts.width = math.floor(vim.o.columns * width)
+    winOpts.height = math.floor(vim.o.lines * height)
+    winOpts.row = math.floor((vim.o.lines - winOpts.height) / 2)
+    winOpts.col = math.ceil((vim.o.columns - winOpts.width) / 2)
+
+    return winOpts
+end
+
 return M
