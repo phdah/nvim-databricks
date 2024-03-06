@@ -50,19 +50,28 @@ end
 -- Run selection --
 -------------------
 
-local function parseCommand(opts)
-    local currentFile = vim.api.nvim_buf_get_name(0)
-    local echoCommand = [[echo "==================================" && echo "Running file: ]] .. currentFile:match('.*/(%S*)') .. [[" && echo "Profile: $DATABRICKS_CONFIG_PROFILE" && echo "ClusterID: $DATABRICKS_CLUSTER_ID" && echo "==================================" && ]]
-    local command = echoCommand .. opts.python .. " " .. currentFile
+local function parseCommand(currentFile)
+    local echoCommand = [[echo "---------------------------" && echo "Running file: ]]
+        .. currentFile:match('.*/(%S*)') .. '"'
+
     if ClusterSelectionState.profile and ClusterSelectionState.clusterId then
-        command = "export DATABRICKS_CONFIG_PROFILE="
-        .. ClusterSelectionState.profile
-        .. " && export DATABRICKS_CLUSTER_ID="
-        .. ClusterSelectionState.clusterId
-        .. " && " .. echoCommand .. opts.python .. " " .. currentFile
-    else
-        print("No cluster selected, using DEFAULT config from " .. opts.DBConfigFile)
+        echoCommand = echoCommand
+        ..  " && export DATABRICKS_CONFIG_PROFILE=" .. ClusterSelectionState.profile
+        .. " && export DATABRICKS_CLUSTER_ID=" .. ClusterSelectionState.clusterId
+        .. [[ && echo "Databricks profile: $DATABRICKS_CONFIG_PROFILE" && echo "ClusterID: $DATABRICKS_CLUSTER_ID" ]]
     end
+
+    echoCommand = echoCommand .. [[ && echo "---------------------------" && ]]
+
+    return echoCommand
+end
+
+local function setupCommand(opts)
+    local currentFile = vim.api.nvim_buf_get_name(0)
+    local echoCommand = parseCommand(currentFile)
+
+    local command =  echoCommand .. opts.python .. " " .. currentFile
+
     return command
 end
 
@@ -74,7 +83,7 @@ is used from your DBConfigFile ('~/.databrickscfg' )
 configuration file
 ]]
 function M.runSelection(opts)
-    local command = parseCommand(opts)
+    local command = setupCommand(opts)
 
     -- Dynamically set the height of the window
     opts.winOpts = utils.setWindowSize(opts.winOpts, 0.7, 0.9)
@@ -83,7 +92,8 @@ function M.runSelection(opts)
     window:createWindow()
     RunOutputState[opts.python] = window
 
-    vim.fn.termopen(command)
+    local echoKeymaps = "echo '" .. window.keymaps .. "'&&"
+    vim.fn.termopen(echoKeymaps .. command)
 
 end
 
@@ -95,6 +105,7 @@ function M.runOutputOpen(opts)
         print("No run performed yet. Run command :DBRun to run the current file. See :h DBRun")
         return
     end
+    opts.winOpts = utils.setWindowSize(opts.winOpts, 0.7, 0.9)
     RunOutputState[opts.python]:createWindow()
 end
 

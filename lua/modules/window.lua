@@ -1,4 +1,3 @@
-local utils = require('modules/utils')
 local Tab = require('modules/buffers').Tab
 
 ------------
@@ -16,6 +15,7 @@ function Window.new(opts, name)
 
     -- Run helper functions
     self:createBuffer()
+    self:runKeymaps()
 
     return self
 end
@@ -23,7 +23,48 @@ end
 -- Create and open a window with instance options
 function Window:createWindow()
     -- Open window
-    vim.api.nvim_open_win(self.buf, true, self.winOpts)
+    self.win = vim.api.nvim_open_win(self.buf, true, self.winOpts)
+end
+
+-- Close opened window
+function Window:closeBuffer()
+    if vim.api.nvim_buf_is_valid(self.buf) then
+        vim.api.nvim_win_close(self.win, false)
+    end
+end
+
+function Window:keymaps()
+    -- Key mapping to close the buffer
+    self.keymaps = "[q] quit"
+    vim.api.nvim_buf_set_keymap(self.buf, 'n', 'q', '', {
+        noremap = true,
+        silent = true,
+        callback = function()
+            self:closeBuffer()
+        end,
+    })
+end
+
+--[[
+Setup keymaps specifically for cluster window
+]]
+function Window:runKeymaps()
+    -- Load default keymaps
+    self:keymaps()
+
+    -- Key mapping to rerun the the file
+    self.keymaps = self.keymaps .. ", [r] rerun"
+    vim.api.nvim_buf_set_keymap(self.buf, 'n', 'r', '', {
+        noremap = true,
+        silent = true,
+        callback = function()
+            self:closeBuffer()
+            vim.cmd("DBRun")
+        end,
+    })
+
+    -- Finish the keymaps with empty line
+    self.keymaps = self.keymaps .. "\n"
 end
 
 --------------------
@@ -131,7 +172,13 @@ function ClusterWindow:getClusterId(clusterName)
 
 end
 
-function ClusterWindow:keymaps()
+--[[
+Setup keymaps specifically for cluster window
+]]
+function ClusterWindow:clusterKeymaps()
+    -- Load default keymaps
+    self:keymaps()
+
     -- Key mappings for buffer control
     vim.api.nvim_buf_set_keymap(self.buf, 'n', 'h', '', {
         noremap = true,
@@ -166,15 +213,6 @@ function ClusterWindow:keymaps()
             ClusterSelectionState.name = self:getClusterName()
             self:_closeClusterWindow()
             ClusterSelectionState.clusterId = self:getClusterId(ClusterSelectionState.name)
-        end,
-    })
-
-    -- Key mapping to close the buffer
-    vim.api.nvim_buf_set_keymap(self.buf, 'n', 'q', '', {
-        noremap = true,
-        silent = true,
-        callback = function()
-            self:_closeClusterWindow()
         end,
     })
 
@@ -217,7 +255,7 @@ function ClusterWindow:setupClusterWindow(windows)
     vim.api.nvim_win_set_option(self.win, 'cursorline', true)
     vim.api.nvim_buf_set_option(self.buf, 'modifiable', false)
     self:setParentAndChildProfile(windows)
-    self:keymaps()
+    self:clusterKeymaps()
 end
 
 -------------
