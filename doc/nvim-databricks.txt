@@ -1,0 +1,13 @@
+================================================================================
+INTRODUCTION                                                   *nvim-databricks*
+
+nvim-databricks is a plugin for working locally, in nvim, with your databricks
+project. It helps you view clusters and workspaces, and choose your decired
+option. Further it has support to easily run and view output from the current
+file you are working in.
+
+Getting started with nvim-databricks:
+  1. Run `:checkhealth nvim-databricks` to make sure everything is installed.
+  2. Evaluate it is working with
+  4. Read |telescope.setup| to check what config keys are available and what
+
