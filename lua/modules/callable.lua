@@ -66,11 +66,13 @@ local function parseCommand(currentFile)
     return echoCommand
 end
 
-local function setupCommand(opts)
+local function setupCommand(opts, arguments)
     local currentFile = vim.api.nvim_buf_get_name(0)
     local echoCommand = parseCommand(currentFile)
 
-    local command =  echoCommand .. opts.python .. " " .. currentFile
+    local command =  echoCommand
+        .. opts.python .. " " .. currentFile
+        .. " " .. arguments
 
     return command
 end
@@ -82,8 +84,8 @@ selection has been made, the DEFAULT profile
 is used from your DBConfigFile ('~/.databrickscfg' )
 configuration file
 ]]
-function M.runSelection(opts)
-    local command = setupCommand(opts)
+function M.runSelection(opts, arguments)
+    local command = setupCommand(opts, arguments)
 
     -- Dynamically set the height of the window
     opts.winOpts = utils.setWindowSize(opts.winOpts, 0.7, 0.9)
