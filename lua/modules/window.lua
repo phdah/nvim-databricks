@@ -37,6 +37,7 @@ setmetatable(ClusterWindow, Window)
 function ClusterWindow.new(opts, name, profiles)
     local self = setmetatable({}, ClusterWindow)
     self.name = name
+    self.states = opts.states
     self.winOpts = opts.winOpts
 
     -- Run helper functions

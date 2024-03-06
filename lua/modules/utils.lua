@@ -32,11 +32,23 @@ function M.addTableKeys(table, keyNumber)
         return newTable
 end
 
-function M.getClusterStateAndName(splitLines)
+function M.getClusterStateAndName(states, splitLines)
     local transformed = {}
     for _, v in pairs(splitLines) do
         -- Concatenate the state and name with a space and add to the new table
-        table.insert(transformed, v[2] .. " " .. v[3])
+        -- Subbstitute the state with signs
+        local state = v[2]
+        if v[2] == "TERMINATED" then
+            state = states.terminated
+        elseif v[2] == "RUNNING" then
+            state = states.running
+        elseif v[2] == "PENDING" then
+            state = states.pending
+        elseif v[2] == "TERMINATING" then
+            state = states.terminating
+        end
+
+        table.insert(transformed, state .. " " .. v[3])
     end
     return transformed
 end

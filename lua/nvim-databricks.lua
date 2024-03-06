@@ -18,6 +18,14 @@ M.setup = function(userOpts)
     -- Set python version
     if opts.python == nil then opts.python = "python3.10" end
 
+    -- Cluster state icons
+    if opts.states == nil then opts.states = {
+        terminated = " ■        ",
+        running = " ▶        ",
+        pending = " ...      ",
+        terminating = " ■        ",
+    } end
+
     -------------------------------
     -- Setup base configurations --
     -------------------------------
