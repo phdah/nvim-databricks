@@ -20,10 +20,10 @@ M.setup = function(userOpts)
 
     -- Cluster state icons
     if opts.states == nil then opts.states = {
-        terminated = " ■        ",
-        running = " ▶        ",
-        pending = " ...      ",
-        terminating = " ■        ",
+        terminated = "         ",
+        running = "         ",
+        pending = "          ",
+        terminating = "         ",
     } end
 
     -------------------------------
