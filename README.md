@@ -88,6 +88,7 @@ vim.api.nvim_set_keymap('n', '<new_keymap>', ':DBPrintState')
 | Add a complete UI, which displays graphical objects | 🟨 |
 | Add graphical objects to indicate, e.g., selected cluster and its state | 🟨 |
 | Add file type check for how to run with `DBRun`, e.g., if `.py` use `python` | 🟨 |
+| Add a `y` key for yanking all relevant output from the `DBRun` output window | 🟨 |
 
 ## Known bugs
 
