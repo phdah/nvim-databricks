@@ -209,8 +209,8 @@ function ClusterWindow:clusterKeymaps()
         silent = true,
         callback = function()
             ClusterSelectionState.profile = self.name
-            print("Picked cluster: " .. self:getClusterName())
             ClusterSelectionState.name = self:getClusterName()
+            print("Picked cluster: " .. ClusterSelectionState.name)
             self:_closeClusterWindow()
             ClusterSelectionState.clusterId = self:getClusterId(ClusterSelectionState.name)
         end,
