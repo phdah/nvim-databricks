@@ -84,10 +84,11 @@ vim.api.nvim_set_keymap('n', '<new_keymap>', ':DBPrintState')
 | Build a `run` module, to utelize lua in memory variables for cluster choosing | ✅ |
 | Optimize window opening by `persisting` buffers | ✅ |
 | Optimize window using `asynchronous` Databricks API calls | ✅ |
+| Add `nerd` fonts images for cluster status etc | ✅ |
 | Add a complete UI, which displays graphical objects | 🟨 |
 | Add graphical objects to indicate, e.g., selected cluster and its state | 🟨 |
-| Add `nerd` fonts images for cluster status etc | 🟨 |
 | Add file type check for how to run with `DBRun`, e.g., if `.py` use `python` | 🟨 |
+| Add a `y` key for yanking all relevant output from the `DBRun` output window | 🟨 |
 
 ## Known bugs
 

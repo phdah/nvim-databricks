@@ -46,6 +46,22 @@ function Selection.new(profile, clusterId)
     return self
 end
 
+---------------
+-- Run Output --
+---------------
+
+local RunOutput = {}
+RunOutput.__index = RunOutput
+setmetatable(RunOutput, State)
+
+function RunOutput.new(profile, clusterId)
+    local self = setmetatable({}, RunOutput)
+    self.profile = profile or nil
+    self.clusterId = clusterId or nil
+
+    return self
+end
+
 -------------
 -- Returns --
 -------------
@@ -54,5 +70,6 @@ local M = {}
 
 M.Buffer = Buffer
 M.Selection = Selection
+M.RunOutput = RunOutput
 
 return M

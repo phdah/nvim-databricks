@@ -15,26 +15,28 @@ M.setup = function(userOpts)
     -- Databricks connection configuration file
     if opts.DBConfigFile == nil then opts.DBConfigFile = '~/.databrickscfg' end
 
-    -- Floating window size
-    if opts.width == nil then opts.width = math.floor(vim.o.columns * 0.9) end
-    if opts.height == nil then opts.height = 20 end
-    if opts.row == nil then opts.row = math.floor((vim.o.lines - opts.height) / 2) end
-    if opts.col == nil then opts.col = math.ceil((vim.o.columns - opts.width) / 2) end
-
     -- Set python version
     if opts.python == nil then opts.python = "python3.10" end
+
+    -- Cluster state icons
+    if opts.states == nil then opts.states = {
+        terminated = "         ",
+        running = "         ",
+        pending = "          ",
+        terminating = "         ",
+    } end
 
     -------------------------------
     -- Setup base configurations --
     -------------------------------
 
-    -- Create the floating window
+    --[[
+    Create the floating window
+    The height and width is dynamicall
+    set for each window created.
+    ]]
     opts.winOpts = {
         relative = 'editor',
-        width = opts.width,
-        height = opts.height,
-        row = opts.row,
-        col = opts.col,
         style = 'minimal',
         border = 'rounded',
     }
@@ -59,11 +61,15 @@ M.setup = function(userOpts)
     -------------------------
 
     vim.api.nvim_create_user_command('DBOpen', function()
-        callable.openWindow(opts)
+        callable.openClusterWindow(opts)
     end, {})
 
-    vim.api.nvim_create_user_command('DBRun', function()
-        callable.runSelection(opts)
+    vim.api.nvim_create_user_command('DBRun', function(arguments)
+        callable.runSelection(opts, arguments.args)
+    end, {nargs = "*"})
+
+    vim.api.nvim_create_user_command('DBRunOpen', function()
+        callable.runOutputOpen(opts)
     end, {})
 
     vim.api.nvim_create_user_command('DBPrintState', function()
