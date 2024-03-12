@@ -52,7 +52,7 @@ end
 
 local Tab = {
     boarder = "---------------------------",
-    header = "[q] quit, [enter] select, [r/R] redraw/all, [h] left, [l] right",
+    header = "[q] quit, [enter] select, [s] start/stop, [r/R] redraw/all, [h] left, [l] right",
     columns = "Status    Cluster Name",
     headerLength = 3 + 1 -- Clusters start on +1 line
 }

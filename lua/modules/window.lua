@@ -152,7 +152,7 @@ function ClusterWindow:getClusterName()
 
     -- Split the lineContent on space and get the cluster name
     -- The status is the forst word, so we skip that
-    return lineContent:match('%S+%s+(.*)')
+    return lineContent:match('%s+%s+(.*)')
 end
 
 function ClusterWindow:getClusterId(clusterName)
@@ -170,6 +170,26 @@ function ClusterWindow:getClusterId(clusterName)
 
     return clusterId
 
+end
+
+function ClusterWindow:toggleClusterOnOff(clusterTable, onlyStart)
+    local command
+    if clusterTable[2] == "TERMINATED" then
+        command = "databricks clusters start --no-wait " .. clusterTable[1]
+        print("Starting cluster: " .. clusterTable[3])
+    else
+        if not onlyStart then
+            command = "databricks clusters delete --no-wait " .. clusterTable[1]
+            print("Stopping cluster: " .. clusterTable[3])
+        end
+    end
+
+    if command then
+        local result = vim.fn.system(command)
+        if vim.v.shell_error ~= 0 then
+            print("Error executing command: " .. command .. " Error was: " .. result)
+        end
+    end
 end
 
 --[[
@@ -215,6 +235,11 @@ function ClusterWindow:clusterKeymaps()
         vim.cmd("DBOpen")
     end
 
+    function self:_startStopCluster(onlyStart)
+        local clusterName = self:getClusterName()
+        local clusterTable = self.clustersTable[clusterName]
+        self:toggleClusterOnOff(clusterTable, onlyStart)
+    end
 
     vim.api.nvim_buf_set_keymap(self.buf, 'n', '<CR>', '', {
         noremap = true,
@@ -223,8 +248,18 @@ function ClusterWindow:clusterKeymaps()
             ClusterSelectionState.profile = self.name
             ClusterSelectionState.name = self:getClusterName()
             print("Picked cluster: " .. ClusterSelectionState.name)
+            self:_startStopCluster(true)
             self:_closeClusterWindow()
             ClusterSelectionState.clusterId = self:getClusterId(ClusterSelectionState.name)
+        end,
+    })
+
+    vim.api.nvim_buf_set_keymap(self.buf, 'n', 's', '', {
+        noremap = true,
+        silent = true,
+        callback = function()
+            self:_startStopCluster(false)
+            self:_resetWindow(false)
         end,
     })
 
