@@ -22,8 +22,9 @@ M.setup = function(userOpts)
     if opts.states == nil then opts.states = {
         terminated = "         ",
         running = "         ",
-        pending = "          ",
-        terminating = "         ",
+        pending = "       ",
+        resizing = " 󰩨        ",
+        terminating = "      ",
     } end
 
     -------------------------------
