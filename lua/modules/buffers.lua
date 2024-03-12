@@ -25,7 +25,7 @@ function Buffer:getClusters(fresh)
     ]]
     if DB_CLUSTERS_LIST and DB_CLUSTERS_LIST[self.name] and #DB_CLUSTERS_LIST[self.name] > 0  and not fresh then
         self.clustersTable = utils.addTableKeys(DB_CLUSTERS_LIST[self.name], 3)
-        self.clusters = utils.getClusterStateAndName(DB_CLUSTERS_LIST[self.name])
+        self.clusters = utils.getClusterStateAndName(self.states, DB_CLUSTERS_LIST[self.name])
     else
         local command = "databricks --profile " .. self.name .. [[ clusters list --output JSON | jq -r '.[] | select(.cluster_name | startswith("job-") | not) | .cluster_id + "|" + .state + "|" + .cluster_name']]
         -- Execute the shell command and get the clusters
@@ -34,7 +34,7 @@ function Buffer:getClusters(fresh)
 
         -- Specifically encode to be a table of strings
         -- with only STATE and NAME
-        self.clusters = utils.getClusterStateAndName(clustersTable)
+        self.clusters = utils.getClusterStateAndName(self.states, clustersTable)
 
         DB_CLUSTERS_LIST[self.name] = utils.tableCopy(self.clustersTable)
     end
