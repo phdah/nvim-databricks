@@ -204,6 +204,18 @@ function ClusterWindow:clusterKeymaps()
         vim.api.nvim_del_augroup_by_id(self.augroup)
     end
 
+    function self:_resetWindow(full)
+        -- Get cluster info for the specific profile
+        if full then
+            DB_CLUSTERS_LIST = {}
+        else
+            self:getClusters(true)
+        end
+        self:_closeClusterWindow()
+        vim.cmd("DBOpen")
+    end
+
+
     vim.api.nvim_buf_set_keymap(self.buf, 'n', '<CR>', '', {
         noremap = true,
         silent = true,
@@ -221,10 +233,7 @@ function ClusterWindow:clusterKeymaps()
         noremap = true,
         silent = true,
         callback = function()
-            self:_closeClusterWindow()
-            -- Get cluster info for the specific profile
-            self:getClusters(true)
-            vim.cmd("DBOpen")
+            self:_resetWindow(false)
         end,
     })
 
@@ -233,10 +242,7 @@ function ClusterWindow:clusterKeymaps()
         noremap = true,
         silent = true,
         callback = function()
-            self:_closeClusterWindow()
-            -- Get cluster info for all the buffers
-            DB_CLUSTERS_LIST = {}
-            vim.cmd("DBOpen")
+            self:_resetWindow(true)
         end,
     })
 end
