@@ -9,7 +9,13 @@ A simple, minimalistic, easy plugin to work with Databricks & Pyspark locally
 nvim-databricks example cluster view
 </p>
 
-![Demo Image](https://github.com/phdah/nvim-databricks/raw/main/images/demo.png)
+![Demo Image](https://github.com/phdah/nvim-databricks/raw/main/images/demo_clusters.png)
+
+<p align="center">
+nvim-databricks example run output
+</p>
+
+![Demo Image](https://github.com/phdah/nvim-databricks/raw/main/images/demo_run.png)
 
 <!-- badges: start -->
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/phdah/nvim-databricks/blob/main/LICENSE)
@@ -89,6 +95,7 @@ vim.api.nvim_set_keymap('n', '<new_keymap>', ':DBPrintState')
 | Add graphical objects to indicate, e.g., selected cluster and its state | 🟨 |
 | Add file type check for how to run with `DBRun`, e.g., if `.py` use `python` | 🟨 |
 | Add a `y` key for yanking all relevant output from the `DBRun` output window | 🟨 |
+| Add a `h` key for `help`, in which we can see all the keymaps. The "list" of them is too long now | 🟨 |
 
 ## Known bugs
 
