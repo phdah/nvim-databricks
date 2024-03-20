@@ -54,7 +54,7 @@ require('nvim-databricks').setup()
 
 For adding config, add a setup input like
 ````lua
-require('buff-statusline').setup({
+require('nvim-databricks').setup({
     DBConfigFile = '~/.databrickscfg', -- Set path to Databricks connect config file
     python = 'python3.10', -- Set Python version for DBRun
 })
