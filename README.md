@@ -1,5 +1,5 @@
 <h1 align="center">
-  nvim-databricks (0.2.0-beta)
+  nvim-databricks
 </h1>
 <p align="center">
 A simple, minimalistic, easy plugin to work with Databricks & Pyspark locally
@@ -38,6 +38,7 @@ jobs-api-version = 2.1
 [other_profile]
 ...
 ```
+> **_NOTE:_** All profiles that are in this file, needs to have valid setups, otherwise the plugin won't work
 
 ## Installation
 
@@ -98,6 +99,8 @@ vim.api.nvim_set_keymap('n', '<new_keymap>', ':DBPrintState')
 | Add a `h` key for `help`, in which we can see all the keymaps. The "list" of them is too long now | 🟨 |
 
 ## Known bugs
+
+> **_NOTE:_** If the plugin don't work, it's important to first check that any potential `VPN`'s or `Databricks tokens` are setup correctly. This would most likely show with a message: `Error executing command: databricks --profile prod clusters list ... ` when running `DBOpen`. This error is due to a failing `Databricks API` call.
 
 | Bugs | Status | Solution |
 | --- | --- | --- |

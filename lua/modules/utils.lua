@@ -57,8 +57,14 @@ end
 
 function M.callLines(command, seperator)
     local lines = vim.fn.systemlist(command)
-    if vim.v.shell_error ~= 0 then
+    -- Databricks API returns a message starting with `Error:`, which is used
+    -- here for detecting a failed call. This is due to systemlist failing to
+    -- return non-zero shell_error when call fails. Unsure why this is
+    if vim.v.shell_error ~= 0 or lines[1]:match("^Error:") ~= nil then
         print("Error executing command: " .. command)
+        for _, line in ipairs(lines) do
+            print(line)
+        end
         return
     end
 
