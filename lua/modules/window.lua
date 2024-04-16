@@ -172,6 +172,18 @@ function ClusterWindow:getClusterId(clusterName)
 
 end
 
+function ClusterWindow:setDapEnv()
+    local dap = require("dap")
+    dap.configurations.python = {
+        {
+            env = {
+                DATABRICKS_CONFIG_PROFILE = ClusterSelectionState.profile,
+                DATABRICKS_CLUSTER_ID = ClusterSelectionState.clusterId
+            },
+        }
+    }
+end
+
 function ClusterWindow:toggleClusterOnOff(clusterTable, onlyStart)
     local command
     if clusterTable[2] == "TERMINATED" then
@@ -251,6 +263,9 @@ function ClusterWindow:clusterKeymaps()
             self:_startStopCluster(true)
             self:_closeClusterWindow()
             ClusterSelectionState.clusterId = self:getClusterId(ClusterSelectionState.name)
+            if true then
+                self:setDapEnv()
+            end
         end,
     })
 
