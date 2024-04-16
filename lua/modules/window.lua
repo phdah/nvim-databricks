@@ -80,6 +80,7 @@ function ClusterWindow.new(opts, name, profiles)
     self.name = name
     self.states = opts.states
     self.winOpts = opts.winOpts
+    self.dap = opts.dap
 
     -- Run helper functions
     self:createTabs(profiles)
@@ -172,6 +173,31 @@ function ClusterWindow:getClusterId(clusterName)
 
 end
 
+--[[
+Set cluster to use when debugging using nvim-dap by setting the environment
+variables for Python configurations in nvim-dap, toggled by plugin setup() option
+"dap" as a boolean. Respects any pre-existing environmental variables.
+]]
+function ClusterWindow:setDapEnv()
+    if not self.dap then
+        return
+    end
+    local dap_ok, dap = pcall(require, "dap")
+    if not (dap_ok) then
+        print("nvim-dap not installed!")
+        return
+    end
+    if dap.configurations.python then
+        for _,config in ipairs(dap.configurations.python) do
+            if not config.env then
+                config.env = {}
+            end
+            config.env.DATABRICKS_CONFIG_PROFILE = ClusterSelectionState.profile
+            config.env.DATABRICKS_CLUSTER_ID = ClusterSelectionState.clusterId
+        end
+    end
+end
+
 function ClusterWindow:toggleClusterOnOff(clusterTable, onlyStart)
     local command
     if clusterTable[2] == "TERMINATED" then
@@ -251,6 +277,7 @@ function ClusterWindow:clusterKeymaps()
             self:_startStopCluster(true)
             self:_closeClusterWindow()
             ClusterSelectionState.clusterId = self:getClusterId(ClusterSelectionState.name)
+            self:setDapEnv()
         end,
     })
 

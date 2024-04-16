@@ -21,6 +21,8 @@ nvim-databricks example run output
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/phdah/nvim-databricks/blob/main/LICENSE)
 <!-- badges: end -->
 
+Plugin to `view`, `start`/`stop` and `pick` a Databricks cluster when working with spark locally through [databricks-connect](https://learn.microsoft.com/en-us/azure/databricks/dev-tools/databricks-connect/python/). Offers a custom `run output` window and support for picking cluster when debugging using [nvim-dap](https://github.com/mfussenegger/nvim-dap).
+
 ## Requirements
 
 - Neovim `0.9.2`
@@ -40,11 +42,19 @@ jobs-api-version = 2.1
 ```
 > **_NOTE:_** All profiles that are in this file, needs to have valid setups, otherwise the plugin won't work
 
+##### Support
+- [nvim-dap](https://github.com/mfussenegger/nvim-dap), setting picked `Databricks cluster` when running debugger
+
 ## Installation
 
-Use your favorite package manager, e.g., `packer`:
+Use your favorite package manager, e.g., `lazy`:
 ````lua
-use {'phdah/nvim-databricks'}
+{
+    'phdah/nvim-databricks',
+    dependencies = {
+        'mfussenegger/nvim-dap', -- Optional dependency
+    }
+}
 ````
 and in your `init.lua`, put
 ````lua
@@ -58,6 +68,7 @@ For adding config, add a setup input like
 require('nvim-databricks').setup({
     DBConfigFile = '~/.databrickscfg', -- Set path to Databricks connect config file
     python = 'python3.10', -- Set Python version for DBRun
+    dap = "true", -- Toggle to enable setting nvim-dap python environmental variables for cluster selection
 })
 ````
 > **_NOTE:_** The values above are the defaults, so if this is what you want, just leave the setup empty.
