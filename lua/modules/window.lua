@@ -174,14 +174,14 @@ end
 
 function ClusterWindow:setDapEnv()
     local dap = require("dap")
-    dap.configurations.python = {
-        {
-            env = {
+    if dap.configurations.python then
+        for i in pairs(dap.configurations.python) do
+            dap.configurations.python[i].env = {
                 DATABRICKS_CONFIG_PROFILE = ClusterSelectionState.profile,
                 DATABRICKS_CLUSTER_ID = ClusterSelectionState.clusterId
-            },
-        }
-    }
+            }
+        end
+    end
 end
 
 function ClusterWindow:toggleClusterOnOff(clusterTable, onlyStart)
