@@ -18,18 +18,22 @@ M.setup = function(userOpts)
     -- Set python version
     if opts.python == nil then opts.python = "python3.10" end
 
+    -- Set DAP option
+    if opts.dap == nil then opts.dap = "true" end
+
+
+    -------------------------------
+    -- Setup base configurations --
+    -------------------------------
+
     -- Cluster state icons
-    if opts.states == nil then opts.states = {
+    opts.states = {
         terminated = "         ",
         running = "         ",
         pending = "       ",
         resizing = " 󰩨        ",
         terminating = "      ",
-    } end
-
-    -------------------------------
-    -- Setup base configurations --
-    -------------------------------
+    }
 
     --[[
     Create the floating window
