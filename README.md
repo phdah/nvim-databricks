@@ -67,7 +67,7 @@ For adding config, add a setup input like
 ````lua
 require('nvim-databricks').setup({
     DBConfigFile = '~/.databrickscfg', -- Set path to Databricks connect config file
-    python = 'python3.10', -- Set Python version for DBRun
+    python = 'python3', -- Set Python version for DBRun
     dap = "true", -- Toggle to enable setting nvim-dap python environmental variables for cluster selection
 })
 ````
