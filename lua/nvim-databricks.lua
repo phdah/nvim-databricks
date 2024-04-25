@@ -16,7 +16,7 @@ M.setup = function(userOpts)
     if opts.DBConfigFile == nil then opts.DBConfigFile = '~/.databrickscfg' end
 
     -- Set python version
-    if opts.python == nil then opts.python = "python3.10" end
+    if opts.python == nil then opts.python = "python3" end
 
     -- Set DAP option
     if opts.dap == nil then opts.dap = "true" end

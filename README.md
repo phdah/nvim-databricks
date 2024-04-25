@@ -23,7 +23,7 @@ nvim-databricks example run output
 
 Plugin to `view`, `start`/`stop` and `pick` a Databricks cluster when working with spark locally through [databricks-connect](https://learn.microsoft.com/en-us/azure/databricks/dev-tools/databricks-connect/python/). Offers a custom `run output` window and support for picking cluster when debugging using [nvim-dap](https://github.com/mfussenegger/nvim-dap).
 
-## Requirements
+## 📋 Requirements
 
 - Neovim `0.9.2`
 - `jq` cli, install for your specific OS
@@ -45,7 +45,7 @@ jobs-api-version = 2.1
 ##### Support
 - [nvim-dap](https://github.com/mfussenegger/nvim-dap), setting picked `Databricks cluster` when running debugger
 
-## Installation
+## 📦 Installation
 
 Use your favorite package manager, e.g., `lazy`:
 ````lua
@@ -61,19 +61,20 @@ and in your `init.lua`, put
 require('nvim-databricks').setup()
 ````
 
-## Configurations
+## ⚙️  Configurations
 
 For adding config, add a setup input like
 ````lua
 require('nvim-databricks').setup({
     DBConfigFile = '~/.databrickscfg', -- Set path to Databricks connect config file
-    python = 'python3.10', -- Set Python version for DBRun
+    python = 'python3', -- Set Python version for DBRun
     dap = "true", -- Toggle to enable setting nvim-dap python environmental variables for cluster selection
 })
 ````
-> **_NOTE:_** The values above are the defaults, so if this is what you want, just leave the setup empty.
+For more advanced configuarations, refer to [Advanced Configurations](#advanced-configurations)
+> **_NOTE:_** The values above are the defaults, so if this is what you want, just leave the setup empty. As defualt, python3 is used to be compatible with Mac users, and should pick up any `venv` dynamically.
 
-## Using
+## 🚀 Using
 Here are the functions available to use
 
 | Command | Description |
@@ -89,6 +90,14 @@ vim.api.nvim_set_keymap('n', '<new_keymap>', ':DBOpen')
 vim.api.nvim_set_keymap('n', '<new_keymap>', ':DBRun')
 vim.api.nvim_set_keymap('n', '<new_keymap>', ':DBPrintState')
 ````
+
+## ⚙️  Advanced Configurations
+For customizing the Python interpreter used by this plugin, you can specify it directly in the `setup` configuration as a string, or using the `require` function to access it from somewhere. The `python` configuration runs within the same process as the Neovim subprocess shell. For example, if you're also using the [venv-selector.nvim](https://github.com/linux-cultist/venv-selector.nvim) plugin to manage your virtual environments, you can reference its active path like
+```lua
+require('nvim-databricks').setup({
+    python = require('venv-selector').get_active_path(),
+})
+```
 
 ## Limitations
 * Currently only supports `Pyspark`.
