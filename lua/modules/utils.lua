@@ -48,6 +48,8 @@ function M.getClusterStateAndName(states, splitLines)
             state = states.terminating
         elseif v[2] == "RESIZING" then
             state = states.resizing
+        elseif v[2] == "RESTARTING " then
+            state = states.restarting
         end
 
         table.insert(transformed, state .. " " .. v[3])

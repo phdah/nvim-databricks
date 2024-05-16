@@ -28,11 +28,12 @@ M.setup = function(userOpts)
 
     -- Cluster state icons
     opts.states = {
-        terminated = "         ",
-        running = "         ",
-        pending = "       ",
-        resizing = " 󰩨        ",
-        terminating = "      ",
+        terminated =    "         ",
+        running =       "         ",
+        pending =       "       ",
+        resizing =      " 󰩨        ",
+        terminating =   "       ",
+        restarting =    "       ",
     }
 
     --[[
