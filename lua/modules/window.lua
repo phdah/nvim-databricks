@@ -153,7 +153,7 @@ function ClusterWindow:getClusterName()
 
     -- Split the lineContent on space and get the cluster name
     -- The status is the forst word, so we skip that
-    return lineContent:match('%s+%s+(.*)')
+    return lineContent:match('%S+%s+(.*)')
 end
 
 function ClusterWindow:getClusterId(clusterName)
