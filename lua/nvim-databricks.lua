@@ -30,10 +30,10 @@ M.setup = function(userOpts)
     opts.states = {
         terminated =    "         ",
         running =       "         ",
-        pending =       "       ",
+        pending =       "       ",
         resizing =      " 󰩨        ",
-        terminating =   "       ",
-        restarting =    "       ",
+        terminating =   "       ",
+        restarting =    "       ",
     }
 
     --[[
