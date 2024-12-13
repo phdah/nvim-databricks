@@ -20,6 +20,8 @@ nvim-databricks example run output
 <!-- badges: start -->
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/phdah/nvim-databricks/blob/main/LICENSE)
 <!-- badges: end -->
+> [!IMPORTANT]
+> This plugin is no longer maintained, in favor of my new plugin: [lazydbrix](https://github.com/phdah/lazydbrix), which solves the same problem, but, better.
 
 Plugin to `view`, `start`/`stop` and `pick` a Databricks cluster when working with spark locally through [databricks-connect](https://learn.microsoft.com/en-us/azure/databricks/dev-tools/databricks-connect/python/). Offers a custom `run output` window and support for picking cluster when debugging using [nvim-dap](https://github.com/mfussenegger/nvim-dap).
 
